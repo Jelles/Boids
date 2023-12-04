@@ -35,4 +35,12 @@ export class Vector {
     angle() {
         return Math.atan2(this.y, this.x) * 180 / Math.PI;
     }
+
+    distance(position: Vector) {
+        return Math.sqrt(Math.pow(this.x - position.x, 2) + Math.pow(this.y - position.y, 2));
+    }
+
+    setMagnitude(maxSpeed: number) {
+        return this.normalize().multiply(maxSpeed);
+    }
 }

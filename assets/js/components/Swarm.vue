@@ -8,18 +8,17 @@ import {Vector} from "assets/js/types/Vector";
 const boids = ref<Boid[]>([]);
 const computedBoids = computed(() => boids.value);
 const bounds = {
-  width: 800,
+  width: 2000,
   height: 800,
 }
 
 const target = new Vector(0, 0)
-
 onMounted(() => {
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 10; i++) {
     boids.value.push(new Boid());
   }
 
-  setInterval(update, 10);
+  setInterval(update, 1000 / 60);
 
   // save mouse position as target
   window.addEventListener('mousemove', (event) => {
@@ -30,7 +29,8 @@ onMounted(() => {
 
 const update = () => {
   for (let i = 0; i < computedBoids.value.length; i++) {
-    computedBoids.value[i].update(bounds, target);
+    console.log(computedBoids.value[i].position.x, computedBoids.value[i].position.y);
+    computedBoids.value[i].update(bounds, computedBoids.value as Boid[]);
   }
 };
 
