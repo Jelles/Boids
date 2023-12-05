@@ -1,6 +1,7 @@
 import {Vector} from "assets/js/types/Vector";
 
 export class Boid {
+    public static BOID_SIZE = 5;
     position: Vector;
     velocity: Vector;
     acceleration: Vector;
@@ -8,16 +9,16 @@ export class Boid {
     maxSpeed: number;
     rotation: number;
     constructor() {
-        this.position = new Vector(0,0);
-        this.velocity = new Vector(Math.random() * 5, Math.random() * 5);
+        this.position = new Vector(Math.random() * 500, Math.random() * 500);
+        this.velocity = new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1);
         this.acceleration = new Vector(0, 0);
         this.rotation = 0;
         this.maxForce = 0.1;
-        this.maxSpeed = 4;
+        this.maxSpeed = 2;
     }
 
     update(bounds: { width: number; height: number; }, boids: Boid[]) {
-        this.applyBehaviors(boids);
+        this.rotation = this.velocity.angle();
 
         this.velocity = this.velocity.add(this.acceleration);
         this.velocity = this.velocity.limit(this.maxSpeed);
@@ -25,8 +26,9 @@ export class Boid {
         this.acceleration = this.acceleration.multiply(0);
 
 
-        this.rotation = this.velocity.angle() - 90;
         this.checkBounds(bounds.width, bounds.height);
+
+        console.log(this.position);
     }
 
     applyForce(force: Vector) {
@@ -71,11 +73,10 @@ export class Boid {
         circleCenter = circleCenter.add(displacement.multiply(wanderR));
         let wanderForce = circleCenter.subtract(this.position);
         return wanderForce;
-
     }
 
     cohesion(boids: Boid[]) {
-        let neighbordist = 50;
+        let neighbordist = Boid.BOID_SIZE * 4;
         let sum = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
@@ -94,7 +95,7 @@ export class Boid {
     }
 
     separation(boids: Boid[]) {
-        let desiredseparation = 35;
+        let desiredseparation = Boid.BOID_SIZE * 3;
         let steer = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
@@ -120,7 +121,7 @@ export class Boid {
     }
 
     alignment(boids: Boid[]) {
-        let neighbordist = 50;
+        let neighbordist = Boid.BOID_SIZE * 4;
         let sum = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
@@ -143,16 +144,20 @@ export class Boid {
     }
     
     private checkBounds(canvasWidth: number, canvasHeight: number): void {
-        // do not flip the velocity add force instead
-        if (this.position.x > canvasWidth) {
-            this.position.x = 0;
-        } else if (this.position.x < 0) {
-            this.position.x = canvasWidth;
+        const boidSize = Boid.BOID_SIZE * .5;
+        const x = this.position.x;
+        const y = this.position.y;
+
+        if (x > canvasWidth - boidSize) {
+            this.velocity.x += -1;
+        } else if (x < boidSize) {
+            this.velocity.x += 1;
         }
-        if (this.position.y > canvasHeight) {
-            this.position.y = 0;
-        } else if (this.position.y < 0) {
-            this.position.y = canvasHeight;
+
+        if (y > canvasHeight - boidSize) {
+            this.velocity.y += -1;
+        } else if (y < boidSize) {
+            this.velocity.y += 1;
         }
 
     }

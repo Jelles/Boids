@@ -8,8 +8,8 @@ import {Vector} from "assets/js/types/Vector";
 const boids = ref<Boid[]>([]);
 const computedBoids = computed(() => boids.value);
 const bounds = {
-  width: 2000,
-  height: 800,
+  width: 500,
+  height: 500,
 }
 
 const target = new Vector(0, 0)
@@ -18,7 +18,8 @@ onMounted(() => {
     boids.value.push(new Boid());
   }
 
-  setInterval(update, 1000 / 60);
+
+  setInterval(update, 1000 / 120);
 
   // save mouse position as target
   window.addEventListener('mousemove', (event) => {
@@ -37,16 +38,12 @@ const update = () => {
 </script>
 
 <template>
-  <div class="swarm">
-    <BoidComponent v-for="(boid, index) in computedBoids" :key="index"  :boid="boid"/>
+  <div class="flex justify-center">
+    <div class="bg-white border-2 border-black" :style="`width: ${bounds.width}px; height: ${bounds.height}px;`">
+      <BoidComponent v-for="(boid, index) in computedBoids" :key="index" :boid="boid as Boid"/>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.swarm {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-color: #f0f0f0; /* or any background color you prefer */
-}
 </style>
