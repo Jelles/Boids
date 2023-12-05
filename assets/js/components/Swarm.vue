@@ -4,9 +4,11 @@ import {onMounted, ref} from "vue";
 import BoidComponent from "~/assets/js/components/Boid.vue";
 import {Boid} from "assets/js/types/Boid";
 import {Vector} from "assets/js/types/Vector";
+import SwarmSettings from "assets/js/components/SwarmSettings.vue";
 
 const boids = ref<Boid[]>([]);
 const computedBoids = computed(() => boids.value);
+
 const bounds = {
   width: 500,
   height: 500,
@@ -29,8 +31,10 @@ onMounted(() => {
 });
 
 const update = () => {
+  console.log("Seperation: " + computedBoids.value[0].desiredSeparation)
+  console.log("Alignment: " + computedBoids.value[0].desiredAlignment)
+  console.log("Cohesion: " + computedBoids.value[0].desiredCohesion)
   for (let i = 0; i < computedBoids.value.length; i++) {
-    console.log(computedBoids.value[i].position.x, computedBoids.value[i].position.y);
     computedBoids.value[i].update(bounds, computedBoids.value as Boid[]);
   }
 };
@@ -43,6 +47,7 @@ const update = () => {
       <BoidComponent v-for="(boid, index) in computedBoids" :key="index" :boid="boid as Boid"/>
     </div>
   </div>
+  <SwarmSettings :boids="computedBoids"/>
 </template>
 
 <style scoped>

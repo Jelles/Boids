@@ -43,4 +43,11 @@ export class Vector {
     setMagnitude(maxSpeed: number) {
         return this.normalize().multiply(maxSpeed);
     }
+
+    rotate(wanderAngle: number) {
+        return new Vector(
+            this.x * Math.cos(wanderAngle) - this.y * Math.sin(wanderAngle),
+            this.x * Math.sin(wanderAngle) + this.y * Math.cos(wanderAngle)
+        );
+    }
 }

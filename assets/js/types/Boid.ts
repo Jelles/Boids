@@ -1,23 +1,28 @@
 import {Vector} from "assets/js/types/Vector";
 
 export class Boid {
-    public static BOID_SIZE = 5;
+    public static BOID_SIZE: number = 25;
+    public desiredSeparation: number = 25;
+    public desiredCohesion: number = 50 / 1000;
+    public desiredAlignment: number = 50;
+
+    private wanderAngle: number = 0;
     position: Vector;
     velocity: Vector;
     acceleration: Vector;
-    maxForce: number;
-    maxSpeed: number;
-    rotation: number;
+    maxForce: number = 0.1;
+    maxSpeed: number = 2;
+    rotation: number = 0;
+
     constructor() {
         this.position = new Vector(Math.random() * 500, Math.random() * 500);
         this.velocity = new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1);
         this.acceleration = new Vector(0, 0);
-        this.rotation = 0;
-        this.maxForce = 0.1;
-        this.maxSpeed = 2;
     }
 
     update(bounds: { width: number; height: number; }, boids: Boid[]) {
+        this.applyBehaviors(boids);
+
         this.rotation = this.velocity.angle();
 
         this.velocity = this.velocity.add(this.acceleration);
@@ -27,8 +32,6 @@ export class Boid {
 
 
         this.checkBounds(bounds.width, bounds.height);
-
-        console.log(this.position);
     }
 
     applyForce(force: Vector) {
@@ -47,6 +50,9 @@ export class Boid {
         this.applyForce(separateForce);
         this.applyForce(alignForce);
         this.applyForce(cohesionForce);
+
+        const wanderForce = this.wander();
+        this.applyForce(wanderForce);
     }
 
     seek(target: Vector) {
@@ -65,23 +71,24 @@ export class Boid {
     wander() {
         let wanderR = 25;
         let wanderD = 80;
-        let change = 0.05;
-        this.velocity = this.velocity.normalize();
-        let circleCenter = this.velocity.multiply(wanderD);
-        let displacement = new Vector(0, -1);
-        displacement = this.setAngle(displacement, this.rotation);
-        circleCenter = circleCenter.add(displacement.multiply(wanderR));
-        let wanderForce = circleCenter.subtract(this.position);
-        return wanderForce;
+        let change = 0.3;
+        this.wanderAngle += Math.random() * change - change * .5;
+        let circlePos = this.velocity;
+        circlePos = circlePos.normalize();
+        circlePos = circlePos.multiply(wanderD);
+        circlePos = circlePos.add(this.position);
+        let h = this.velocity.angle();
+        let circleOffset = new Vector(wanderR * Math.cos(this.wanderAngle + h), wanderR * Math.sin(this.wanderAngle + h));
+        let target = circlePos.add(circleOffset);
+        return this.seek(target);
     }
 
     cohesion(boids: Boid[]) {
-        let neighbordist = Boid.BOID_SIZE * 4;
         let sum = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
             let d = this.position.distance(boids[i].position);
-            if ((d > 0) && (d < neighbordist)) {
+            if ((d > 0) && (d < this.desiredCohesion)) {
                 sum = sum.add(boids[i].position);
                 count++;
             }
@@ -95,12 +102,11 @@ export class Boid {
     }
 
     separation(boids: Boid[]) {
-        let desiredseparation = Boid.BOID_SIZE * 3;
         let steer = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
             let d = this.position.distance(boids[i].position);
-            if ((d > 0) && (d < desiredseparation)) {
+            if ((d > 0) && (d < this.desiredSeparation)) {
                 let diff = this.position.subtract(boids[i].position);
                 diff = diff.normalize();
                 diff = diff.divide(d);
@@ -121,12 +127,11 @@ export class Boid {
     }
 
     alignment(boids: Boid[]) {
-        let neighbordist = Boid.BOID_SIZE * 4;
         let sum = new Vector(0, 0);
         let count = 0;
         for (let i = 0; i < boids.length; i++) {
             let d = this.position.distance(boids[i].position);
-            if ((d > 0) && (d < neighbordist)) {
+            if ((d > 0) && (d < this.desiredAlignment)) {
                 sum = sum.add(boids[i].velocity);
                 count++;
             }
@@ -159,13 +164,5 @@ export class Boid {
         } else if (y < boidSize) {
             this.velocity.y += 1;
         }
-
-    }
-
-    private setAngle(displacement: Vector, number: number) {
-        let len = displacement.magnitude();
-        displacement.x = Math.cos(number) * len;
-        displacement.y = Math.sin(number) * len;
-        return displacement;
     }
 }
