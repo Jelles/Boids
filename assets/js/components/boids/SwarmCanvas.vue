@@ -62,7 +62,6 @@ const drawBoids = () => {
 </script>
 
 <template>
-
   <div class="flex flex-col items-center justify-center pt-12">
     <div class="justify-center">
       <UDivider class="m-4">

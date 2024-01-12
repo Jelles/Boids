@@ -1,10 +1,12 @@
 <template>
-  <UDivider class="m-4 pt-12">
-    <span class="text-5xl">Flocking Simulation</span>
-  </UDivider>
-  <div class="grid grid-cols-2">
-    <Swarm :amount="5" :bounds="{width: 500, height: 500}"/>
-    <SwarmV2 :amount="5" :bounds="{width: 500, height: 500}"/>
+  <div class="overflow-hidden">
+    <UDivider class="m-4 pt-12">
+      <span class="text-5xl">Flocking Simulation</span>
+    </UDivider>
+    <div class="grid grid-cols-2 overflow-hidden">
+      <Swarm :amount="5" :bounds="{width: 500, height: 500}"/>
+      <SwarmV2 :amount="5" :bounds="{width: 500, height: 500}"/>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
