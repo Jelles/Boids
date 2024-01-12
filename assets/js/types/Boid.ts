@@ -1,9 +1,9 @@
 import {Vector} from "assets/js/types/Vector";
-
+import BoidUtil from "assets/js/util/BoidUtil"
 export class Boid {
     public static BOID_SIZE: number = 25;
     public desiredSeparation: number = 25;
-    public desiredCohesion: number = 50 / 1000;
+    public desiredCohesion: number = 5;
     public desiredAlignment: number = 50;
 
     private wanderAngle: number = 0;
@@ -12,6 +12,7 @@ export class Boid {
     acceleration: Vector;
     maxForce: number = 0.1;
     maxSpeed: number = 2;
+    angle: number = 0;
     rotation: number = 0;
 
     constructor() {
@@ -22,17 +23,32 @@ export class Boid {
 
     update(bounds: { width: number; height: number; }, boids: Boid[]) {
         this.applyBehaviors(boids);
+        this.updateMotion();
+        this.checkBounds(bounds.width, bounds.height);
+    }
 
-        this.rotation = this.velocity.angle();
-
+    updateMotion() {
+        this.angle = this.velocity.angle();
+        this.rotation = this.angle * Math.PI / 180 + Math.PI / 2;
         this.velocity = this.velocity.add(this.acceleration);
         this.velocity = this.velocity.limit(this.maxSpeed);
         this.position = this.position.add(this.velocity);
         this.acceleration = this.acceleration.multiply(0);
-
-
-        this.checkBounds(bounds.width, bounds.height);
     }
+
+    draw(ctx: CanvasRenderingContext2D) {
+        ctx.save();
+        BoidUtil.drawDirectionArrow(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, this.angle);
+        // BoidUtil.drawArrow(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, Boid.BOID_SIZE);
+
+        BoidUtil.drawBoid(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, Boid.BOID_SIZE, this.rotation);
+        BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredSeparation)
+        BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredCohesion)
+        BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredAlignment)
+
+        ctx.restore();
+    }
+
 
     applyForce(force: Vector) {
         this.acceleration = this.acceleration.add(force);
@@ -85,7 +101,10 @@ export class Boid {
         for (let i = 0; i < boids.length; i++) {
             let d = this.position.distance(boids[i].position);
             if ((d > 0) && (d < this.desiredCohesion)) {
-                sum = sum.add(boids[i].position);
+                let diff = this.position.subtract(boids[i].position);
+                diff = diff.normalize();
+                diff = diff.divide(d);
+                sum = sum.add(diff);
                 count++;
             }
         }
@@ -143,22 +162,14 @@ export class Boid {
             return new Vector(0, 0);
         }
     }
-    
-    private checkBounds(canvasWidth: number, canvasHeight: number): void {
-        const boidSize = Boid.BOID_SIZE * .5;
-        const x = this.position.x;
-        const y = this.position.y;
 
-        if (x > canvasWidth - boidSize) {
-            this.velocity.x += -1;
-        } else if (x < boidSize) {
-            this.velocity.x += 1;
+    checkBounds(width: number, height: number) {
+        const margin = Boid.BOID_SIZE;
+        if (this.position.x > width - margin || this.position.x < margin) {
+            this.velocity.x *= -1;
         }
-
-        if (y > canvasHeight - boidSize) {
-            this.velocity.y += -1;
-        } else if (y < boidSize) {
-            this.velocity.y += 1;
+        if (this.position.y > height - margin || this.position.y < margin) {
+            this.velocity.y *= -1;
         }
     }
 }
