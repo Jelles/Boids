@@ -2,50 +2,49 @@
 
 import {onMounted, ref} from "vue";
 import {Boid} from "assets/js/types/Boid";
-import {Vector} from "assets/js/types/Vector";
 import SwarmSettings from "assets/js/components/boids/SwarmSettings.vue";
+import type { PropType } from 'vue'
 
 const boids = ref<Boid[]>([]);
-const target = new Vector(0, 0);
 const canvas = ref<HTMLCanvasElement>();
 let ctx: CanvasRenderingContext2D | null;
 
-const bounds = {
-  width: 500,
-  height: 500,
-}
+const props = defineProps({
+  amount: {
+    type: Number,
+    required: true
+  },
+  bounds: {
+    type: Object as PropType<{ width: number, height: number }>,
+    required: true
+  },
+});
 
 onMounted(() => {
-  for (let i = 0; i < 10; i++) {
-    boids.value.push(new Boid());
+  for (let i = 0; i < props.amount; i++) {
+    boids.value.push(new Boid(props.bounds));
   }
 
   canvas.value = document.querySelector('canvas') as HTMLCanvasElement;
-  canvas.value.width = bounds.width;
-  canvas.value.height = bounds.height;
+  canvas.value.width = props.bounds.width;
+  canvas.value.height = props.bounds.height;
 
   ctx = canvas.value.getContext('2d');
 
 
   const updateBoids = setInterval(() => {
-    boids.value.forEach(boid => boid.update(bounds, boids.value as Boid[]));
+    boids.value.forEach(boid => boid.update(props.bounds, boids.value as Boid[]));
   }, 1000 / 120);
 
-  const mouseMoveHandler = (event: any) => {
-    target.x = event.clientX;
-    target.y = event.clientY;
-  };
-
-  window.addEventListener('mousemove', mouseMoveHandler);
+  canvas.value.addEventListener('click', (e) => {
+    const boid = new Boid(props.bounds);
+    boid.setPos(e.offsetX, e.offsetY);
+    boids.value.push(boid);
+  });
 
   onUnmounted(() => {
     clearInterval(updateBoids);
-    window.removeEventListener('mousemove', mouseMoveHandler);
   });
-
-  // log the size of the ctx to the console
-  console.log(ctx);
-  console.log(canvas.value)
 
   drawBoids();
 });
@@ -53,8 +52,8 @@ onMounted(() => {
 
 
 const drawBoids = () => {
-  ctx?.clearRect(0, 0, bounds.width, bounds.height);
-  boids.value.forEach(boid => boid.draw(ctx as CanvasRenderingContext2D));
+  ctx?.clearRect(0, 0, props.bounds.width, props.bounds.height);
+  boids.value.forEach(boid => boid.draw(ctx as CanvasRenderingContext2D, true));
 
   requestAnimationFrame(drawBoids);
 }
@@ -63,7 +62,13 @@ const drawBoids = () => {
 </script>
 
 <template>
+
   <div class="flex flex-col items-center justify-center pt-12">
+    <div class="justify-center">
+      <UDivider class="m-4">
+        <span class="text-2xl">Canvas Swarm</span>
+      </UDivider>
+    </div>
     <canvas ref="canvas" class="bg-white border-2 border-black" :style="`width: ${bounds.width}px; height: ${bounds.height}px;`"></canvas>
     <SwarmSettings :boids="boids"/>
   </div>

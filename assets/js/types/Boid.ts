@@ -15,8 +15,8 @@ export class Boid {
     angle: number = 0;
     rotation: number = 0;
 
-    constructor() {
-        this.position = new Vector(Math.random() * 500, Math.random() * 500);
+    constructor(bounds: { width: number; height: number; }) {
+        this.position = new Vector(Math.random() * bounds.width, Math.random() * bounds.height);
         this.velocity = new Vector(Math.random() * 2 - 1, Math.random() * 2 - 1);
         this.acceleration = new Vector(0, 0);
     }
@@ -25,6 +25,10 @@ export class Boid {
         this.applyBehaviors(boids);
         this.updateMotion();
         this.checkBounds(bounds.width, bounds.height);
+    }
+
+    setPos(x: number, y: number) {
+        this.position = new Vector(x, y);
     }
 
     updateMotion() {
@@ -36,17 +40,23 @@ export class Boid {
         this.acceleration = this.acceleration.multiply(0);
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D, debug: boolean) {
         ctx.save();
-        BoidUtil.drawDirectionArrow(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, this.angle);
-        // BoidUtil.drawArrow(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, Boid.BOID_SIZE);
 
         BoidUtil.drawBoid(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, Boid.BOID_SIZE, this.rotation);
+
+        if (debug) {
+            this.drawDebug(ctx);
+        }
+
+        ctx.restore();
+    }
+
+    drawDebug(ctx: CanvasRenderingContext2D) {
+        BoidUtil.drawDirectionArrow(ctx, this.position.x, this.position.y, Boid.BOID_SIZE, this.angle);
         BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredSeparation)
         BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredCohesion)
         BoidUtil.drawCircle(ctx, this.position.x, this.position.y, this.desiredAlignment)
-
-        ctx.restore();
     }
 
 
