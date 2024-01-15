@@ -2,6 +2,7 @@ const animate = require("tailwindcss-animate")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: ["./assets/js/components/**/*.js", "./assets/js/components/**/*.vue"],
   darkMode: ["class"],
   safelist: ["dark"],
   
@@ -14,6 +15,12 @@ module.exports = {
       },
     },
     extend: {
+      skew: {
+        '16': '16deg',
+        '20': '20deg',
+        '24': '24deg',
+        '32': '32deg',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

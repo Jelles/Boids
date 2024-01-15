@@ -1,6 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'fat-reg';
+  src: url('../fonts/fat-reg.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'fat-slant';
+  src: url('../fonts/fat-slant.otf') format('opentype');
+}
  
 @layer base {
   :root {
