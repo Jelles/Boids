@@ -44,9 +44,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center pt-12">
+  <div class="flex flex-col items-center justify-center pt-12 p-4">
     <div class="justify-center">
-      <UDivider class="m-4">
+      <UDivider class="m-4 p-4">
         <span class="text-2xl">HTML Swarm</span>
       </UDivider>
     </div>

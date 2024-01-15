@@ -25,9 +25,9 @@ watch([cohesion, alignment, separation], () => {
 </script>
 
 <template>
-  <div class="w-1/2">
+  <div class="w-full">
     <div class="justify-center">
-      <UDivider class="m-4">
+      <UDivider class="m-4 p-4">
         <span class="text-2xl">Swarm Settings</span>
       </UDivider>
     </div>
