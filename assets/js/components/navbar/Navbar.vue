@@ -1,6 +1,6 @@
 <template>
   <div class="navigation fixed inset-y-0 right-0 w-1/3 overflow-y-auto p-8">
-    <div v-for="item in menuItems" :key="item" class="text-white text-9xl mb-4 cursor-pointer transform -skew-y-6">
+    <div v-for="item in menuItems" :key="item" class="text-white text-9xl mb-4 cursor-pointer transform -skew-y-6 font-outline-2">
       {{ item }}
     </div>
   </div>
