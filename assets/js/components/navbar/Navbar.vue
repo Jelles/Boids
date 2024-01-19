@@ -1,19 +1,44 @@
 <template>
-  <div class="navigation fixed inset-y-0 right-0 w-1/3 overflow-y-auto p-8">
-    <div v-for="item in menuItems" :key="item" class="text-white text-9xl mb-4 cursor-pointer transform -skew-y-6 font-outline-2">
-      {{ item }}
-    </div>
+  <div v-if="!navbar" class="p-4">
+    <UButton color="gray" @click="showNav">
+      <template #trailing>
+        <UIcon name="i-heroicons-bars-3 p-3" />
+      </template>
+    </UButton>
+  </div>
+
+  <div v-if="navbar" class="navigation fixed inset-y-0 pt-4">
+    <UVerticalNavigation :links="links" />
   </div>
 </template>
 <script setup lang="ts">
-const menuItems = ref(["Boids", "Project 2", "Project 3", "Project 4"]);
+import type {VerticalNavigationLink} from "#ui/types";
+
+const navbar = ref(false);
+
+const links:VerticalNavigationLink[] = [
+  {
+    label: "Home",
+    icon: "i-heroicons-home",
+    to: "/",
+  },
+  {
+    label: "Boids Flocking",
+    icon: "i-heroicons-home",
+    to: "/boids",
+  },
+  {
+    label: "Fluid Simulation",
+    icon: "i-heroicons-home",
+    to: "/fluid",
+  },
+];
+
+const showNav = () => {
+  navbar.value = !navbar.value;
+};
+
 </script>
 
 <style scoped>
-/* https://fonts.google.com/?preview.text=TEST */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
-
-.navigation {
-  font-family: 'Bebas Neue', cursive;
-}
 </style>
