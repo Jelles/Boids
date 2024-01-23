@@ -28,9 +28,9 @@ const links:VerticalNavigationLink[] = [
     to: "/boids",
   },
   {
-    label: "Fluid Simulation",
+    label: "Noise",
     icon: "i-heroicons-home",
-    to: "/fluid",
+    to: "/noise",
   },
 ];
 
